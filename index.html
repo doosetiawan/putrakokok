@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mode Karyawan - Toko Putra Kokok</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        
+        /* Custom Scrollbar for a cleaner look */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Animations */
+        .cart-item-enter { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col text-slate-800">
+
+    <!-- Header / Navbar -->
+    <header class="bg-blue-700 text-white shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
+                    <i class="fas fa-store text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight tracking-wide">Toko Putra Kokok</h1>
+                    <p class="text-blue-200 text-xs font-medium uppercase tracking-wider">Mode Karyawan / Order Taker</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <!-- Search Bar (Desktop only, hidden on small mobile) -->
+                <div class="hidden sm:block relative">
+                    <input type="text" placeholder="Cari barang..." class="py-2 pl-10 pr-4 rounded-full bg-blue-800/50 text-white placeholder-blue-300 border border-blue-600 focus:outline-none focus:bg-white focus:text-slate-800 focus:placeholder-slate-400 transition-colors w-64 text-sm">
+                    <i class="fas fa-search absolute left-3.5 top-2.5 text-blue-300"></i>
+                </div>
+                <!-- User Profile -->
+                <div class="flex items-center gap-2">
+                    <span class="text-sm font-medium hidden sm:block">Andi Pramuniaga</span>
+                    <div class="w-9 h-9 rounded-full bg-blue-500 border-2 border-blue-300 flex items-center justify-center">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Layout (Responsive: Stack on Mobile, Side-by-Side on Desktop) -->
+    <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row gap-6">
+        
+        <!-- ==================================
+             LEFT COLUMN: PRODUCT LIST
+        =================================== -->
+        <div class="w-full md:w-2/3 lg:w-3/4 flex flex-col">
+            <div class="flex justify-between items-end mb-4">
+                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fas fa-box-open text-blue-600"></i> Katalog Produk
+                </h2>
+                <!-- Mobile search (visible only on mobile) -->
+                <div class="sm:hidden relative w-1/2">
+                    <input type="text" placeholder="Cari..." class="w-full py-1.5 pl-8 pr-3 rounded-md border border-slate-300 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                    <i class="fas fa-search absolute left-2.5 top-2 text-slate-400 text-xs"></i>
+                </div>
+            </div>
+            
+            <!-- Product Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 pb-10" id="product-list">
+                <!-- Products dynamically injected via JS -->
+            </div>
+        </div>
+
+        <!-- ==================================
+             RIGHT COLUMN: CART / PESANAN
+        =================================== -->
+        <div class="w-full md:w-1/3 lg:w-1/4 relative">
+            <!-- Sticky container for desktop view -->
+            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 flex flex-col md:sticky md:top-24 h-auto md:max-h-[calc(100vh-8rem)]">
+                
+                <!-- Cart Header -->
+                <div class="p-4 border-b border-slate-100 bg-slate-50 rounded-t-2xl flex justify-between items-center shrink-0">
+                    <h2 class="font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fas fa-shopping-cart text-orange-500"></i> Keranjang
+                    </h2>
+                    <span id="cart-badge" class="bg-orange-100 text-orange-700 text-xs font-bold px-2.5 py-1 rounded-full border border-orange-200">
+                        0 Item
+                    </span>
+                </div>
+
+                <!-- Cart Items (Scrollable) -->
+                <div class="flex-1 overflow-y-auto p-4 min-h-[200px]" id="cart-items">
+                    <!-- Empty State -->
+                    <div id="empty-cart-msg" class="h-full flex flex-col items-center justify-center text-slate-400 py-10">
+                        <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-3">
+                            <i class="fas fa-basket-shopping text-2xl opacity-50"></i>
+                        </div>
+                        <p class="text-sm font-medium">Belum ada pesanan</p>
+                        <p class="text-xs text-slate-400 text-center mt-1">Pilih barang dari daftar untuk menambahkan.</p>
+                    </div>
+                    <!-- Cart items injected via JS -->
+                </div>
+
+                <!-- Cart Footer (Totals & Action) -->
+                <div class="p-4 border-t border-slate-100 bg-white rounded-b-2xl shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-slate-500 font-semibold text-sm">Total Estimasi</span>
+                        <span id="grand-total" class="text-xl font-black text-blue-700">Rp 0</span>
+                    </div>
+                    <button onclick="sendOrder()" id="btn-kirim" class="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-3.5 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed group">
+                        <span>Kirim ke Kasir</span>
+                        <i class="fas fa-paper-plane group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                </div>
+                
+            </div>
+        </div>
+    </main>
+
+    <!-- Global Toast Notification Container -->
+    <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none w-full max-w-sm px-4">
+        <!-- Toasts will appear here -->
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // --- DATA & STATE ---
+        const products = [
+            { id: 1, name: 'Ember', price: 75000, imgIcon: 'fa-sack-xmark', color: 'text-amber-700', bg: 'bg-amber-100' },
+            { id: 2, name: 'Sapu Lidi', price: 145000, imgIcon: 'fa-sack-xmark', color: 'text-amber-800', bg: 'bg-amber-200' },
+            { id: 3, name: 'Serok gorengan', price: 36000, imgIcon: 'fa-bottle-droplet', color: 'text-yellow-600', bg: 'bg-yellow-100' },
+            { id: 4, name: 'Wajan', price: 16500, imgIcon: 'fa-cubes-stacked', color: 'text-slate-600', bg: 'bg-slate-200' },
+            { id: 5, name: 'Bak Mandi', price: 28000, imgIcon: 'fa-egg', color: 'text-orange-500', bg: 'bg-orange-100' },
+            { id: 6, name: 'Rak kecil', price: 13000, imgIcon: 'fa-bread-slice', color: 'text-yellow-700', bg: 'bg-yellow-50' },
+            { id: 7, name: 'Sandal', price: 115000, imgIcon: 'fa-box', color: 'text-red-600', bg: 'bg-red-100' },
+            { id: 8, name: 'Keset', price: 55000, imgIcon: 'fa-trowel-bricks', color: 'text-slate-700', bg: 'bg-slate-300' },
+        ];
+
+        let cart = [];
+
+        // --- UTILITIES ---
+        const formatRupiah = (number) => {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
+        };
+
+        const showToast = (message, type = 'success') => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const bgColor = type === 'success' ? 'bg-slate-800' : 'bg-red-600';
+            const iconColor = type === 'success' ? 'text-green-400' : 'text-white';
+            const iconType = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+
+            toast.className = `${bgColor} text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 transform transition-all duration-300 translate-y-[-20px] opacity-0`;
+            toast.innerHTML = `
+                <i class="fas ${iconType} ${iconColor} text-xl"></i>
+                <span class="font-medium text-sm">${message}</span>
+            `;
+
+            container.appendChild(toast);
+
+            // Animate in
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-[-20px]', 'opacity-0');
+                toast.classList.add('translate-y-0', 'opacity-100');
+            });
+
+            // Animate out & remove
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-[-20px]', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        };
+
+        // --- UI RENDERING ---
+        const renderProducts = () => {
+            const container = document.getElementById('product-list');
+            container.innerHTML = '';
+
+            products.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-xl p-4 shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-300 transition-all flex flex-col justify-between group';
+                card.innerHTML = `
+                    <div>
+                        <div class="w-12 h-12 rounded-lg ${product.bg} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fas ${product.imgIcon} ${product.color} text-xl"></i>
+                        </div>
+                        <h3 class="text-sm font-bold text-slate-800 mb-1 leading-snug">${product.name}</h3>
+                        <p class="text-blue-600 font-bold text-sm mb-4">${formatRupiah(product.price)}</p>
+                    </div>
+                    <button onclick="addToCart(${product.id})" class="w-full py-2 bg-slate-50 hover:bg-blue-600 text-slate-700 hover:text-white border border-slate-200 hover:border-blue-600 rounded-lg text-sm font-bold transition-colors shadow-sm flex justify-center items-center gap-2">
+                        <i class="fas fa-plus"></i> Tambah
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        };
+
+        const renderCart = () => {
+            const container = document.getElementById('cart-items');
+            const emptyMsg = document.getElementById('empty-cart-msg');
+            const totalEl = document.getElementById('grand-total');
+            const badgeEl = document.getElementById('cart-badge');
+            const btnKirim = document.getElementById('btn-kirim');
+
+            let grandTotal = 0;
+            let totalItems = 0;
+            
+            // Clear existing cart items (except empty message)
+            Array.from(container.children).forEach(child => {
+                if(child.id !== 'empty-cart-msg') child.remove();
+            });
+
+            if (cart.length === 0) {
+                emptyMsg.style.display = 'flex';
+                btnKirim.disabled = true;
+            } else {
+                emptyMsg.style.display = 'none';
+                btnKirim.disabled = false;
+
+                cart.forEach(item => {
+                    const subtotal = item.price * item.qty;
+                    grandTotal += subtotal;
+                    totalItems += item.qty;
+
+                    const cartRow = document.createElement('div');
+                    cartRow.className = 'bg-white p-3 rounded-xl border border-slate-100 shadow-sm mb-3 flex justify-between items-center cart-item-enter relative overflow-hidden group';
+                    
+                    // A subtle left border color indicator based on product
+                    cartRow.innerHTML = `
+                        <div class="absolute left-0 top-0 bottom-0 w-1 ${item.bg}"></div>
+                        <div class="flex-1 min-w-0 pl-2 pr-2">
+                            <h4 class="text-sm font-bold text-slate-800 truncate">${item.name}</h4>
+                            <div class="flex items-center text-xs text-slate-500 font-medium mt-0.5">
+                                ${formatRupiah(item.price)} <span class="mx-1">&times;</span> ${item.qty}
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-end shrink-0 gap-1">
+                            <span class="text-sm font-bold text-slate-800">${formatRupiah(subtotal)}</span>
+                            <div class="flex items-center space-x-1">
+                                <button onclick="updateQty(${item.id}, -1)" class="w-7 h-7 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors">
+                                    <i class="fas fa-minus text-[10px]"></i>
+                                </button>
+                                <span class="w-6 text-center text-sm font-bold text-slate-700">${item.qty}</span>
+                                <button onclick="updateQty(${item.id}, 1)" class="w-7 h-7 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-700 flex items-center justify-center transition-colors">
+                                    <i class="fas fa-plus text-[10px]"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(cartRow);
+                });
+            }
+
+            totalEl.innerText = formatRupiah(grandTotal);
+            badgeEl.innerText = `${totalItems} Item`;
+        };
+
+        // --- ACTIONS ---
+        const addToCart = (productId) => {
+            const product = products.find(p => p.id === productId);
+            const existing = cart.find(item => item.id === productId);
+
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ ...product, qty: 1 });
+            }
+            renderCart();
+            showToast(`${product.name} ditambahkan`);
+        };
+
+        const updateQty = (productId, delta) => {
+            const idx = cart.findIndex(item => item.id === productId);
+            if (idx > -1) {
+                cart[idx].qty += delta;
+                if (cart[idx].qty <= 0) {
+                    cart.splice(idx, 1);
+                }
+                renderCart();
+            }
+        };
+
+        const sendOrder = () => {
+            if (cart.length === 0) return;
+
+            const btn = document.getElementById('btn-kirim');
+            const originalContent = btn.innerHTML;
+            
+            // Loading state
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Mengirim Data...';
+            btn.disabled = true;
+
+            // Simulate network request
+            setTimeout(() => {
+                showToast('Sukses! Pesanan dikirim ke kasir utama.');
+                cart = []; // Reset Cart
+                renderCart();
+                btn.innerHTML = originalContent; // Restore button
+            }, 1000);
+        };
+
+        // --- INITIALIZE ---
+        window.onload = () => {
+            renderProducts();
+            renderCart();
+        };
+    </script>
+</body>
+</html>

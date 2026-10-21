@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kasir Utama - Toko Putra Kokok</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; overflow: hidden; }
+        
+        /* Custom Scrollbar for a clean POS look */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Animations */
+        .fade-in { animation: fadeIn 0.2s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Hide number input spinners */
+        input[type="number"]::-webkit-inner-spin-button, 
+        input[type="number"]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; margin: 0; 
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen text-slate-800">
+
+    <!-- Header / Navbar -->
+    <header class="bg-blue-800 text-white shadow-md z-40 shrink-0">
+        <div class="px-4 py-3 flex justify-between items-center h-14">
+            <div class="flex items-center gap-3">
+                <div class="bg-white/20 p-1.5 rounded-lg backdrop-blur-sm">
+                    <i class="fas fa-desktop"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-base leading-tight tracking-wide">Toko Putra Kokok</h1>
+                    <p class="text-blue-200 text-[10px] font-medium uppercase tracking-wider">Dashboard Kasir Utama</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <div class="text-right hidden sm:block">
+                    <p class="text-sm font-bold">Budi Utama</p>
+                    <p class="text-xs text-blue-300">Shift Pagi • POS-01</p>
+                </div>
+                <div class="w-9 h-9 rounded-full bg-blue-600 border border-blue-400 flex items-center justify-center shadow-inner">
+                    <i class="fas fa-user-tie text-sm"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout (3 Columns) -->
+    <main class="flex-1 flex overflow-hidden flex-col lg:flex-row">
+        
+        <!-- ==================================
+             LEFT COLUMN: QUEUE LIST
+        =================================== -->
+        <aside class="w-full lg:w-72 bg-white border-r border-slate-200 flex flex-col shrink-0">
+            <!-- Header Antrean & Transaksi Baru -->
+            <div class="p-4 border-b border-slate-200 bg-slate-50 flex flex-col gap-3 shrink-0">
+                <button onclick="createNewOrder()" class="w-full bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold py-2.5 rounded-xl border border-blue-300 shadow-sm transition-colors flex items-center justify-center gap-2">
+                    <i class="fas fa-plus"></i> Transaksi Baru
+                </button>
+                <div class="flex justify-between items-center">
+                    <h2 class="font-bold text-slate-700 text-sm flex items-center gap-2">
+                        <i class="fas fa-list-ol text-blue-600"></i> Antrean Pramuniaga
+                    </h2>
+                    <span id="queue-count" class="bg-slate-200 text-slate-700 text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
+                </div>
+            </div>
+            
+            <!-- Queue List -->
+            <div class="flex-1 overflow-y-auto p-3 space-y-2 bg-slate-50/50" id="queue-list">
+                <!-- Queue Items Injected by JS -->
+            </div>
+        </aside>
+
+        <!-- ==================================
+             MIDDLE COLUMN: PRODUCT GRID
+        =================================== -->
+        <section class="flex-1 flex flex-col bg-slate-100 relative z-0">
+            <!-- Search Bar -->
+            <div class="p-3 bg-white border-b border-slate-200 shadow-sm shrink-0 flex items-center gap-2 z-10">
+                <div class="relative flex-1">
+                    <i class="fas fa-search absolute left-3 top-2.5 text-slate-400"></i>
+                    <input type="text" id="product-search" placeholder="Cari nama produk..." class="w-full pl-10 pr-4 py-2 bg-slate-100 border-none rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-700 font-medium">
+                </div>
+            </div>
+
+            <!-- Product Grid -->
+            <div class="flex-1 overflow-y-auto p-4">
+                <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3" id="product-grid">
+                    <!-- Products injected by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================================
+             RIGHT COLUMN: ACTIVE CART
+        =================================== -->
+        <aside class="w-full lg:w-96 bg-white border-l border-slate-200 flex flex-col shrink-0 shadow-[-4px_0_15px_rgba(0,0,0,0.03)] z-10 relative">
+            
+            <!-- Cart Header -->
+            <div class="p-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center shrink-0">
+                <div>
+                    <h2 class="font-bold text-slate-800" id="cart-order-id">Pilih/Buat Pesanan</h2>
+                    <p class="text-xs text-slate-500 font-medium mt-0.5" id="cart-order-staff">-</p>
+                </div>
+                <button onclick="clearCart()" class="text-slate-400 hover:text-red-500 transition-colors" title="Kosongkan Keranjang">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+
+            <!-- Cart Items (Scrollable) -->
+            <div class="flex-1 overflow-y-auto p-3 bg-white" id="cart-items-container">
+                <!-- Empty State -->
+                <div id="cart-empty-state" class="h-full flex flex-col items-center justify-center text-slate-400">
+                    <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-3">
+                        <i class="fas fa-shopping-basket text-2xl opacity-50"></i>
+                    </div>
+                    <p class="text-sm font-medium">Keranjang kosong</p>
+                </div>
+                
+                <!-- Items list -->
+                <div id="cart-items-list" class="space-y-3 hidden">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
+
+            <!-- Cart Footer -->
+            <div class="bg-white border-t border-slate-200 p-4 shrink-0">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-slate-500 text-sm font-semibold">Total Tagihan</span>
+                    <span id="cart-grand-total" class="text-2xl font-black text-blue-700">Rp 0</span>
+                </div>
+                
+                <button id="btn-bayar" onclick="openPaymentModal()" disabled class="w-full bg-green-600 hover:bg-green-700 disabled:bg-slate-300 disabled:text-slate-500 text-white font-bold py-3.5 rounded-xl shadow-md transition-colors flex items-center justify-center gap-2 text-lg">
+                    <i class="fas fa-wallet"></i> Proses Pembayaran
+                </button>
+            </div>
+        </aside>
+    </main>
+
+    <!-- ==================================
+         PAYMENT MODAL (Split Payment)
+    =================================== -->
+    <div id="payment-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl flex flex-col max-h-[90vh] fade-in overflow-hidden">
+            
+            <!-- Modal Header -->
+            <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fas fa-cash-register text-blue-600"></i> Penyelesaian Transaksi
+                </h2>
+                <button onclick="closePaymentModal()" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-red-100 hover:text-red-600 flex items-center justify-center transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-5 flex-1 overflow-y-auto space-y-5">
+                <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 flex flex-col items-center justify-center">
+                    <span class="text-blue-600 text-sm font-semibold mb-1">Total Tagihan</span>
+                    <span id="modal-grand-total" class="text-3xl font-black text-blue-800">Rp 0</span>
+                </div>
+
+                <!-- Payment Methods Section -->
+                <div>
+                    <div class="flex justify-between items-end mb-3">
+                        <label class="text-sm font-bold text-slate-700">Metode & Nominal Bayar</label>
+                        <button onclick="addPaymentRow()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-bold transition-colors flex items-center gap-1">
+                            <i class="fas fa-plus"></i> Split Payment
+                        </button>
+                    </div>
+                    
+                    <div id="payment-rows" class="space-y-3">
+                        <!-- Dynamic Payment Rows -->
+                    </div>
+                </div>
+
+                <hr class="border-slate-100">
+
+                <!-- Calculation Summary -->
+                <div class="space-y-2">
+                    <div class="flex justify-between text-slate-600 text-sm">
+                        <span>Total Uang Diterima:</span>
+                        <span id="modal-total-paid" class="font-bold text-slate-800">Rp 0</span>
+                    </div>
+                    <div id="modal-calculation-result" class="flex justify-between p-3 rounded-xl bg-slate-100 items-center">
+                        <span class="font-semibold text-slate-700" id="modal-calc-label">Kurang/Kembali:</span>
+                        <span class="text-xl font-bold text-slate-800" id="modal-calc-value">Rp 0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
+                <button onclick="closePaymentModal()" class="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold hover:bg-slate-100 transition-colors">
+                    Batal
+                </button>
+                <button id="btn-complete-payment" onclick="processPayment()" disabled class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 text-white font-bold transition-colors flex items-center gap-2 shadow-md">
+                    <i class="fas fa-print"></i> Cetak Struk
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[60] bg-slate-800 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300 opacity-0 translate-y-[-20px] pointer-events-none w-max">
+        <i class="fas fa-check-circle text-green-400 text-xl"></i>
+        <span id="toast-msg" class="font-medium text-sm">Aksi berhasil!</span>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- MASTER DATA ---
+        const masterProducts = [
+             { id: 1, name: 'Ember', price: 75000, imgIcon: 'fa-sack-xmark', color: 'text-amber-700', bg: 'bg-amber-100' },
+            { id: 2, name: 'Sapu Lidi', price: 145000, imgIcon: 'fa-sack-xmark', color: 'text-amber-800', bg: 'bg-amber-200' },
+            { id: 3, name: 'Serok gorengan', price: 36000, imgIcon: 'fa-bottle-droplet', color: 'text-yellow-600', bg: 'bg-yellow-100' },
+            { id: 4, name: 'Wajan', price: 16500, imgIcon: 'fa-cubes-stacked', color: 'text-slate-600', bg: 'bg-slate-200' },
+            { id: 5, name: 'Bak Mandi', price: 28000, imgIcon: 'fa-egg', color: 'text-orange-500', bg: 'bg-orange-100' },
+            { id: 6, name: 'Rak kecil', price: 13000, imgIcon: 'fa-bread-slice', color: 'text-yellow-700', bg: 'bg-yellow-50' },
+            { id: 7, name: 'Sandal', price: 115000, imgIcon: 'fa-box', color: 'text-red-600', bg: 'bg-red-100' },
+            { id: 8, name: 'Keset', price: 55000, imgIcon: 'fa-trowel-bricks', color: 'text-slate-700', bg: 'bg-slate-300' },
+            { id: 9, name: 'Susu Kaleng', price: 12000, imgIcon: 'fa-jar', color: 'text-blue-700', bg: 'bg-blue-200' },
+            { id: 10, name: 'Kopi Hitam', price: 15000, imgIcon: 'fa-mug-hot', color: 'text-slate-800', bg: 'bg-slate-300' }
+        ];
+
+        // Antrean dari Karyawan
+        let queue = [
+            {
+                orderId: 'INV-' + Math.floor(Math.random() * 10000),
+                staff: 'Andi Pramuniaga',
+                time: '10:30',
+                items: [
+                    { ...masterProducts[0], qty: 2 },
+                    { ...masterProducts[2], qty: 1 }
+                ]
+            },
+            {
+                orderId: 'INV-' + Math.floor(Math.random() * 10000),
+                staff: 'Siti Karyawan',
+                time: '10:35',
+                items: [
+                    { ...masterProducts[3], qty: 5 },
+                    { ...masterProducts[6], qty: 10 }
+                ]
+            }
+        ];
+
+        // State Aplikasi
+        let activeOrder = null; // Object { orderId, staff, items }
+        let paymentRows = [];
+        let grandTotalActive = 0;
+
+        // --- UTILITIES ---
+        const formatRupiah = (number) => {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
+        };
+
+        const showToast = (msg) => {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('opacity-0', 'translate-y-[-20px]');
+            toast.classList.add('opacity-100', 'translate-y-0');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', 'translate-y-[-20px]');
+            }, 3000);
+        };
+
+        // --- RENDER FUNCTIONS ---
+
+        // 1. Render Middle Column (Products)
+        const renderProducts = (filter = '') => {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '';
+            
+            const filtered = masterProducts.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()));
+            
+            if(filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full py-10 text-center text-slate-400">Barang tidak ditemukan</div>`;
+                return;
+            }
+
+            filtered.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-xl p-3 shadow-sm border border-slate-200 hover:border-blue-400 hover:shadow-md cursor-pointer transition-all flex flex-col justify-between group';
+                card.onclick = () => addProductToCart(product);
+                card.innerHTML = `
+                    <div>
+                        <div class="w-10 h-10 rounded-lg ${product.bg} flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                            <i class="fas ${product.icon} ${product.color} text-lg"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-800 text-xs leading-tight mb-1">${product.name}</h3>
+                        <p class="text-blue-600 font-bold text-xs mb-2">${formatRupiah(product.price)}</p>
+                    </div>
+                    <div class="w-full py-1.5 bg-slate-50 group-hover:bg-blue-600 text-slate-500 group-hover:text-white rounded border border-slate-200 group-hover:border-blue-600 text-[10px] font-bold text-center transition-colors">
+                        <i class="fas fa-plus"></i> Tambah
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        };
+
+        document.getElementById('product-search').addEventListener('input', (e) => {
+            renderProducts(e.target.value);
+        });
+
+        // 2. Render Left Column (Queue)
+        const renderQueue = () => {
+            const list = document.getElementById('queue-list');
+            const count = document.getElementById('queue-count');
+            list.innerHTML = '';
+            count.innerText = queue.length;
+
+            if(queue.length === 0) {
+                list.innerHTML = `<div class="text-center text-slate-400 py-6 text-xs font-medium">Antrean kosong</div>`;
+                return;
+            }
+
+            queue.forEach(order => {
+                const totalItems = order.items.reduce((sum, item) => sum + item.qty, 0);
+                const isActive = activeOrder && activeOrder.orderId === order.orderId;
+                
+                const card = document.createElement('div');
+                card.className = `p-3 rounded-xl border cursor-pointer transition-all ${isActive ? 'bg-blue-600 border-blue-700 text-white shadow-md' : 'bg-white border-slate-200 hover:border-blue-300 text-slate-700'}`;
+                card.onclick = () => loadOrderFromQueue(order.orderId);
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-1">
+                        <span class="font-bold text-sm">#${order.orderId}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-[11px] ${isActive ? 'text-blue-100' : 'text-slate-500'}">
+                        <span><i class="fas fa-user mr-1"></i> ${order.staff}</span>
+                        <span class="font-bold">${totalItems} Pcs</span>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        };
+
+        // 3. Render Right Column (Cart)
+        const renderCart = () => {
+            const container = document.getElementById('cart-items-list');
+            const emptyState = document.getElementById('cart-empty-state');
+            const btnBayar = document.getElementById('btn-bayar');
+            
+            container.innerHTML = '';
+            grandTotalActive = 0;
+
+            if(!activeOrder || activeOrder.items.length === 0) {
+                container.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                document.getElementById('cart-grand-total').innerText = 'Rp 0';
+                btnBayar.disabled = true;
+                
+                // Set Header
+                document.getElementById('cart-order-id').innerText = activeOrder ? `#${activeOrder.orderId}` : 'Pilih/Buat Pesanan';
+                document.getElementById('cart-order-staff').innerText = activeOrder ? `Kasir / Mandiri` : '-';
+                return;
+            }
+
+            // Has items
+            container.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+            btnBayar.disabled = false;
+
+            // Set Header
+            document.getElementById('cart-order-id').innerText = `#${activeOrder.orderId}`;
+            document.getElementById('cart-order-staff').innerText = activeOrder.staff !== 'Kasir' ? `Dari: ${activeOrder.staff}` : 'Kasir / Mandiri';
+
+            activeOrder.items.forEach((item, index) => {
+                const subtotal = item.price * item.qty;
+                grandTotalActive += subtotal;
+
+                const row = document.createElement('div');
+                row.className = 'bg-white border border-slate-100 p-2.5 rounded-xl shadow-sm flex justify-between items-center';
+                row.innerHTML = `
+                    <div class="flex-1 min-w-0 pr-2">
+                        <h4 class="text-xs font-bold text-slate-800 truncate">${item.name}</h4>
+                        <p class="text-[10px] text-slate-500">${formatRupiah(item.price)}</p>
+                    </div>
+                    <div class="flex flex-col items-end gap-1 shrink-0">
+                        <span class="text-xs font-bold text-slate-800">${formatRupiah(subtotal)}</span>
+                        <div class="flex items-center bg-slate-50 border border-slate-200 rounded-lg overflow-hidden">
+                            <button onclick="updateCartQty(${index}, -1)" class="w-6 h-6 flex items-center justify-center hover:bg-slate-200 text-slate-600 transition-colors"><i class="fas fa-minus text-[10px]"></i></button>
+                            <span class="w-6 text-center text-xs font-bold">${item.qty}</span>
+                            <button onclick="updateCartQty(${index}, 1)" class="w-6 h-6 flex items-center justify-center hover:bg-blue-100 text-blue-600 transition-colors"><i class="fas fa-plus text-[10px]"></i></button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+
+            document.getElementById('cart-grand-total').innerText = formatRupiah(grandTotalActive);
+        };
+
+        // --- CART ACTIONS ---
+
+        const createNewOrder = () => {
+            const timestamp = new Date().getTime().toString().slice(-4);
+            activeOrder = {
+                orderId: `KSR-${timestamp}`,
+                staff: 'Kasir',
+                items: []
+            };
+            renderQueue(); // Deselect queue
+            renderCart();
+            showToast('Sesi transaksi baru dimulai.');
+        };
+
+        const loadOrderFromQueue = (orderId) => {
+            const orderToLoad = queue.find(q => q.orderId === orderId);
+            // Deep copy so edits don't affect original queue until paid
+            activeOrder = JSON.parse(JSON.stringify(orderToLoad)); 
+            renderQueue(); // Update selection highlight
+            renderCart();
+        };
+
+        const addProductToCart = (product) => {
+            // Auto create order if none active
+            if(!activeOrder) {
+                createNewOrder();
+            }
+
+            const existingIndex = activeOrder.items.findIndex(item => item.id === product.id);
+            if(existingIndex > -1) {
+                activeOrder.items[existingIndex].qty += 1;
+            } else {
+                activeOrder.items.push({ ...product, qty: 1 });
+            }
+            renderCart();
+        };
+
+        const updateCartQty = (index, delta) => {
+            if(!activeOrder) return;
+            activeOrder.items[index].qty += delta;
+            if(activeOrder.items[index].qty <= 0) {
+                activeOrder.items.splice(index, 1);
+            }
+            renderCart();
+        };
+
+        const clearCart = () => {
+            if(!activeOrder) return;
+            activeOrder.items = [];
+            renderCart();
+        };
+
+
+        // --- PAYMENT MODAL & SPLIT PAYMENT LOGIC ---
+
+        const openPaymentModal = () => {
+            if(!activeOrder || activeOrder.items.length === 0) return;
+            
+            document.getElementById('payment-modal').classList.remove('hidden');
+            document.getElementById('payment-modal').classList.add('flex');
+            document.getElementById('modal-grand-total').innerText = formatRupiah(grandTotalActive);
+            
+            // Initialize payment rows (1 default row for cash full amount)
+            paymentRows = [{
+                id: Date.now(),
+                method: 'Tunai',
+                amount: grandTotalActive
+            }];
+            
+            renderPaymentRows();
+        };
+
+        const closePaymentModal = () => {
+            document.getElementById('payment-modal').classList.add('hidden');
+            document.getElementById('payment-modal').classList.remove('flex');
+        };
+
+        const addPaymentRow = () => {
+            paymentRows.push({
+                id: Date.now(),
+                method: 'QRIS',
+                amount: 0
+            });
+            renderPaymentRows();
+        };
+
+        const removePaymentRow = (id) => {
+            if(paymentRows.length <= 1) return;
+            paymentRows = paymentRows.filter(r => r.id !== id);
+            renderPaymentRows();
+        };
+
+        const updatePaymentMethod = (id, value) => {
+            const row = paymentRows.find(r => r.id === id);
+            if(row) row.method = value;
+        };
+
+        const updatePaymentAmount = (id, value) => {
+            const row = paymentRows.find(r => r.id === id);
+            if(row) {
+                row.amount = parseInt(value) || 0;
+                calculatePaymentResult();
+            }
+        };
+
+        const renderPaymentRows = () => {
+            const container = document.getElementById('payment-rows');
+            container.innerHTML = '';
+
+            paymentRows.forEach((row, index) => {
+                const div = document.createElement('div');
+                div.className = 'flex gap-3 items-start animate-fade-in';
+                div.innerHTML = `
+                    <div class="w-1/3">
+                        <select onchange="updatePaymentMethod(${row.id}, this.value)" class="w-full bg-white border border-slate-300 text-slate-700 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 p-2.5 outline-none font-semibold">
+                            <option value="Tunai" ${row.method === 'Tunai' ? 'selected' : ''}>💵 Tunai</option>
+                            <option value="QRIS" ${row.method === 'QRIS' ? 'selected' : ''}>📱 QRIS</option>
+                            <option value="Debit" ${row.method === 'Debit' ? 'selected' : ''}>💳 Debit/Kredit</option>
+                        </select>
+                    </div>
+                    <div class="flex-1 relative">
+                        <span class="absolute left-3 top-2.5 font-bold text-slate-500">Rp</span>
+                        <input type="number" value="${row.amount}" oninput="updatePaymentAmount(${row.id}, this.value)" class="w-full bg-white border border-slate-300 text-slate-900 text-lg font-bold rounded-xl focus:ring-blue-500 focus:border-blue-500 p-2 pl-9 outline-none">
+                    </div>
+                    ${paymentRows.length > 1 ? `
+                    <button onclick="removePaymentRow(${row.id})" class="mt-1 w-10 h-10 shrink-0 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 flex items-center justify-center transition-colors">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    ` : '<div class="w-10"></div>'}
+                `;
+                container.appendChild(div);
+            });
+
+            calculatePaymentResult();
+        };
+
+        const calculatePaymentResult = () => {
+            const totalPaid = paymentRows.reduce((sum, row) => sum + row.amount, 0);
+            document.getElementById('modal-total-paid').innerText = formatRupiah(totalPaid);
+
+            const resultContainer = document.getElementById('modal-calculation-result');
+            const labelEl = document.getElementById('modal-calc-label');
+            const valueEl = document.getElementById('modal-calc-value');
+            const btnComplete = document.getElementById('btn-complete-payment');
+
+            const diff = totalPaid - grandTotalActive;
+
+            if (diff < 0) {
+                // Kurang bayar
+                resultContainer.className = 'flex justify-between p-3 rounded-xl bg-red-50 border border-red-200 items-center';
+                labelEl.innerText = 'Sisa Tagihan (Kurang):';
+                labelEl.className = 'font-semibold text-red-700 text-sm';
+                valueEl.innerText = formatRupiah(Math.abs(diff));
+                valueEl.className = 'text-lg font-bold text-red-700';
+                btnComplete.disabled = true;
+            } else {
+                // Pas atau ada kembalian
+                resultContainer.className = 'flex justify-between p-3 rounded-xl bg-green-50 border border-green-200 items-center';
+                labelEl.innerText = diff === 0 ? 'Pembayaran Pas:' : 'Uang Kembali:';
+                labelEl.className = 'font-semibold text-green-700 text-sm';
+                valueEl.innerText = formatRupiah(diff);
+                valueEl.className = 'text-xl font-black text-green-700';
+                btnComplete.disabled = false;
+            }
+        };
+
+        const processPayment = () => {
+            // Remove from queue if it was an order from an employee
+            queue = queue.filter(q => q.orderId !== activeOrder.orderId);
+            
+            // Reset active order workspace
+            activeOrder = null;
+            
+            // Close modal & refresh UI
+            closePaymentModal();
+            renderQueue();
+            renderCart();
+            showToast('Transaksi Berhasil! Mencetak struk...');
+        };
+
+        // --- INIT ---
+        window.onload = () => {
+            renderProducts();
+            renderQueue();
+            renderCart();
+        };
+
+    </script>
+</body>
+</html>
