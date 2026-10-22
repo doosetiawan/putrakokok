@@ -30,12 +30,15 @@
 </head>
 <body class="flex h-screen text-slate-800">
 
+    <!-- OVERLAY LAYAR GELAP (HP ON MOBILE) -->
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-30 hidden opacity-0 transition-opacity md:hidden"></div>
+
     <!-- ==========================================
-         SIDEBAR NAVIGATION
+         SIDEBAR NAVIGATION (DRAWER ON MOBILE)
     =========================================== -->
-    <aside class="w-64 bg-slate-900 flex flex-col shrink-0 transition-all duration-300 z-20">
+    <aside class="fixed inset-y-0 left-0 w-64 bg-slate-900 flex flex-col shrink-0 transition-transform duration-300 z-40 -translate-x-full md:translate-x-0 md:relative md:z-20">
         <!-- Logo Area -->
-        <div class="h-16 flex items-center px-6 bg-slate-950 border-b border-slate-800">
+        <div class="h-16 flex items-center justify-between px-6 bg-slate-950 border-b border-slate-800">
             <div class="flex items-center gap-3 text-white">
                 <div class="bg-blue-600 p-1.5 rounded-lg">
                     <i class="fas fa-store-alt"></i>
@@ -45,6 +48,10 @@
                     <p class="text-[10px] text-slate-400 tracking-wider uppercase">Admin Panel</p>
                 </div>
             </div>
+            <!-- Tombol Tutup Sidebar di HP -->
+            <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
 
         <!-- Menu Links -->
@@ -83,92 +90,98 @@
     <main class="flex-1 flex flex-col min-w-0 bg-slate-50">
         
         <!-- Top Header -->
-        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0 z-10">
-            <h2 id="page-title" class="text-xl font-bold text-slate-800">Dashboard Utama</h2>
-            <div class="flex items-center gap-4">
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-6 shrink-0 z-10">
+            <div class="flex items-center gap-3">
+                <!-- Burger Button untuk HP -->
+                <button onclick="toggleSidebar()" class="md:hidden text-slate-600 hover:text-blue-600 p-2 rounded-lg hover:bg-slate-100 transition-colors">
+                    <i class="fas fa-bars text-lg"></i>
+                </button>
+                <h2 id="page-title" class="text-base sm:text-xl font-bold text-slate-800 truncate">Dashboard Utama</h2>
+            </div>
+            
+            <div class="flex items-center gap-3 sm:gap-4">
                 <div class="relative">
-                    <i class="fas fa-bell text-slate-400 hover:text-blue-600 transition-colors cursor-pointer text-lg"></i>
+                    <i class="fas fa-bell text-slate-400 hover:text-blue-600 transition-colors cursor-pointer text-base sm:text-lg"></i>
                     <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
                 </div>
-                <button class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">
-                    <i class="fas fa-sign-out-alt mr-1"></i> Keluar
+                <button class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors flex items-center gap-1">
+                    <i class="fas fa-sign-out-alt"></i> <span class="hidden sm:inline">Keluar</span>
                 </button>
             </div>
         </header>
 
         <!-- Dynamic Content Container -->
-        <div class="flex-1 overflow-y-auto p-6" id="content-container">
+        <div class="flex-1 overflow-y-auto p-4 sm:p-6" id="content-container">
 
             <!-- 1. DASHBOARD UTAMA -->
             <div id="sec-dashboard" class="fade-in space-y-6">
                 <!-- Summary Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-lg bg-green-100 text-green-600 flex items-center justify-center text-xl">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-lg bg-green-100 text-green-600 flex items-center justify-center text-xl shrink-0">
                             <i class="fas fa-cash-register"></i>
                         </div>
                         <div>
-                            <p class="text-sm text-slate-500 font-medium mb-1">Pendapatan Hari Ini</p>
-                            <h3 class="text-xl font-black text-slate-800">Rp 4.500.000</h3>
+                            <p class="text-xs sm:text-sm text-slate-500 font-medium mb-0.5">Pendapatan Hari Ini</p>
+                            <h3 class="text-lg sm:text-xl font-black text-slate-800">Rp 4.500.000</h3>
                         </div>
                     </div>
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-xl">
+                    <div class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-xl shrink-0">
                             <i class="fas fa-receipt"></i>
                         </div>
                         <div>
-                            <p class="text-sm text-slate-500 font-medium mb-1">Total Transaksi</p>
-                            <h3 class="text-xl font-black text-slate-800">42 <span class="text-sm font-normal text-slate-400">struk</span></h3>
+                            <p class="text-xs sm:text-sm text-slate-500 font-medium mb-0.5">Total Transaksi</p>
+                            <h3 class="text-lg sm:text-xl font-black text-slate-800">42 <span class="text-xs sm:text-sm font-normal text-slate-400">struk</span></h3>
                         </div>
                     </div>
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-xl">
+                    <div class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-xl shrink-0">
                             <i class="fas fa-box"></i>
                         </div>
                         <div>
-                            <p class="text-sm text-slate-500 font-medium mb-1">Total Jenis Barang</p>
-                            <h3 class="text-xl font-black text-slate-800">128 <span class="text-sm font-normal text-slate-400">item</span></h3>
+                            <p class="text-xs sm:text-sm text-slate-500 font-medium mb-0.5">Total Jenis Barang</p>
+                            <h3 class="text-lg sm:text-xl font-black text-slate-800">128 <span class="text-xs sm:text-sm font-normal text-slate-400">item</span></h3>
                         </div>
                     </div>
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-lg bg-red-100 text-red-600 flex items-center justify-center text-xl">
+                    <div class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-lg bg-red-100 text-red-600 flex items-center justify-center text-xl shrink-0">
                             <i class="fas fa-exclamation-triangle"></i>
                         </div>
                         <div>
-                            <p class="text-sm text-slate-500 font-medium mb-1">Stok Menipis</p>
-                            <h3 class="text-xl font-black text-red-600">5 <span class="text-sm font-normal text-slate-400">item</span></h3>
+                            <p class="text-xs sm:text-sm text-slate-500 font-medium mb-0.5">Stok Menipis</p>
+                            <h3 class="text-lg sm:text-xl font-black text-red-600">5 <span class="text-xs sm:text-sm font-normal text-slate-400">item</span></h3>
                         </div>
                     </div>
                 </div>
 
                 <!-- Recent Activities Mockup -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200">
-                    <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
-                        <h3 class="font-bold text-slate-800">Aktivitas Kasir Terakhir</h3>
-                        <button onclick="switchMenu('keuangan')" class="text-sm text-blue-600 hover:underline font-medium">Lihat Semua</button>
+                    <div class="px-4 sm:px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+                        <h3 class="font-bold text-slate-800 text-sm sm:text-base">Aktivitas Kasir Terakhir</h3>
+                        <button onclick="switchMenu('keuangan')" class="text-xs sm:text-sm text-blue-600 hover:underline font-medium">Lihat Semua</button>
                     </div>
-                    <div class="p-6">
+                    <div class="p-4 sm:p-6">
                         <div class="space-y-4">
-                            <!-- Items injected here just as visual mockup -->
                             <div class="flex justify-between items-center pb-4 border-b border-slate-50">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                                    <div class="w-2 h-2 rounded-full bg-green-500 shrink-0"></div>
                                     <div>
-                                        <p class="text-sm font-bold text-slate-800">Transaksi #INV-001 <span class="text-xs font-normal text-slate-400 ml-2">10:45 WIB</span></p>
-                                        <p class="text-xs text-slate-500">Kasir: Budi Utama • Metode: QRIS</p>
+                                        <p class="text-xs sm:text-sm font-bold text-slate-800">Transaksi #INV-001 <span class="text-[10px] sm:text-xs font-normal text-slate-400 ml-1">10:45 WIB</span></p>
+                                        <p class="text-[10px] sm:text-xs text-slate-500">Kasir: Budi Utama • QRIS</p>
                                     </div>
                                 </div>
-                                <span class="font-bold text-green-600">+ Rp 150.000</span>
+                                <span class="font-bold text-xs sm:text-sm text-green-600">+ Rp 150.000</span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                                    <div class="w-2 h-2 rounded-full bg-green-500 shrink-0"></div>
                                     <div>
-                                        <p class="text-sm font-bold text-slate-800">Transaksi #INV-002 <span class="text-xs font-normal text-slate-400 ml-2">10:50 WIB</span></p>
-                                        <p class="text-xs text-slate-500">Kasir: Budi Utama • Metode: Tunai</p>
+                                        <p class="text-xs sm:text-sm font-bold text-slate-800">Transaksi #INV-002 <span class="text-[10px] sm:text-xs font-normal text-slate-400 ml-1">10:50 WIB</span></p>
+                                        <p class="text-[10px] sm:text-xs text-slate-500">Kasir: Budi Utama • Tunai</p>
                                     </div>
                                 </div>
-                                <span class="font-bold text-green-600">+ Rp 35.000</span>
+                                <span class="font-bold text-xs sm:text-sm text-green-600">+ Rp 35.000</span>
                             </div>
                         </div>
                     </div>
@@ -179,11 +192,11 @@
             <div id="sec-barang" class="hidden fade-in space-y-6">
                 <!-- Form Input -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
-                        <h3 class="font-bold text-slate-800 flex items-center gap-2"><i class="fas fa-plus-circle text-blue-600"></i> Tambah Barang Baru</h3>
+                    <div class="px-4 sm:px-6 py-4 border-b border-slate-100 bg-slate-50">
+                        <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2"><i class="fas fa-plus-circle text-blue-600"></i> Tambah Barang Baru</h3>
                     </div>
-                    <form onsubmit="event.preventDefault(); showToast('Barang berhasil ditambahkan!'); this.reset();" class="p-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <form onsubmit="event.preventDefault(); showToast('Barang berhasil ditambahkan!'); this.reset();" class="p-4 sm:p-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                             <div class="lg:col-span-2">
                                 <label class="block text-xs font-bold text-slate-600 mb-1">Nama Barang</label>
                                 <input type="text" required placeholder="Contoh: Beras Mapan 5kg" class="w-full bg-white border border-slate-300 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 px-3 py-2 outline-none">
@@ -206,12 +219,12 @@
                                 <input type="number" required placeholder="0" class="w-full bg-white border border-slate-300 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 px-3 py-2 outline-none">
                             </div>
                         </div>
-                        <div class="mt-4 flex justify-between items-end">
-                            <div class="w-32">
+                        <div class="mt-4 flex flex-col sm:flex-row justify-between sm:items-end gap-3">
+                            <div class="w-full sm:w-32">
                                 <label class="block text-xs font-bold text-slate-600 mb-1">Stok Awal</label>
                                 <input type="number" required placeholder="0" class="w-full bg-white border border-slate-300 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 px-3 py-2 outline-none">
                             </div>
-                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors shadow-sm">
+                            <button type="submit" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition-colors shadow-sm">
                                 <i class="fas fa-save mr-1"></i> Simpan
                             </button>
                         </div>
@@ -219,24 +232,24 @@
                 </div>
 
                 <!-- Product Table -->
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200">
-                    <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
-                        <h3 class="font-bold text-slate-800">Daftar Barang (Master Data)</h3>
-                        <div class="relative">
-                            <input type="text" placeholder="Cari barang..." class="pl-8 pr-3 py-1.5 border border-slate-300 rounded-lg text-sm outline-none focus:border-blue-500">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="px-4 sm:px-6 py-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+                        <h3 class="font-bold text-slate-800 text-sm sm:text-base">Daftar Barang (Master Data)</h3>
+                        <div class="relative w-full sm:w-64">
+                            <input type="text" placeholder="Cari barang..." class="w-full pl-8 pr-3 py-1.5 border border-slate-300 rounded-lg text-sm outline-none focus:border-blue-500">
                             <i class="fas fa-search absolute left-2.5 top-2 text-slate-400 text-sm"></i>
                         </div>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm whitespace-nowrap">
+                        <table class="w-full text-left text-xs sm:text-sm whitespace-nowrap">
                             <thead class="bg-slate-50 text-slate-600 border-b border-slate-200">
                                 <tr>
-                                    <th class="px-6 py-3 font-semibold">Kode</th>
-                                    <th class="px-6 py-3 font-semibold">Nama Barang</th>
-                                    <th class="px-6 py-3 font-semibold">Kategori</th>
-                                    <th class="px-6 py-3 font-semibold">Harga Modal</th>
-                                    <th class="px-6 py-3 font-semibold">Harga Jual</th>
-                                    <th class="px-6 py-3 font-semibold text-right">Aksi</th>
+                                    <th class="px-4 sm:px-6 py-3 font-semibold">Kode</th>
+                                    <th class="px-4 sm:px-6 py-3 font-semibold">Nama Barang</th>
+                                    <th class="px-4 sm:px-6 py-3 font-semibold">Kategori</th>
+                                    <th class="px-4 sm:px-6 py-3 font-semibold">Harga Modal</th>
+                                    <th class="px-4 sm:px-6 py-3 font-semibold">Harga Jual</th>
+                                    <th class="px-4 sm:px-6 py-3 font-semibold text-right">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100 text-slate-700" id="tb-master-barang">
@@ -249,19 +262,19 @@
 
             <!-- 3. LAPORAN STOK -->
             <div id="sec-stok" class="hidden fade-in space-y-6">
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200">
-                    <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="px-4 sm:px-6 py-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between sm:items-center gap-3 bg-slate-50">
                         <div>
-                            <h3 class="font-bold text-slate-800">Laporan & Kondisi Stok</h3>
-                            <p class="text-xs text-slate-500 mt-1">Pantau ketersediaan barang di gudang dan rak.</p>
+                            <h3 class="font-bold text-slate-800 text-sm sm:text-base">Laporan & Kondisi Stok</h3>
+                            <p class="text-xs text-slate-500 mt-0.5">Pantau ketersediaan barang di gudang dan rak.</p>
                         </div>
-                        <button class="text-sm bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 px-4 py-2 rounded-lg font-medium shadow-sm transition-colors">
+                        <button class="w-max text-xs sm:text-sm bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 px-3.5 py-2 rounded-lg font-medium shadow-sm transition-colors">
                             <i class="fas fa-download mr-1"></i> Export PDF
                         </button>
                     </div>
-                    <div class="overflow-x-auto p-4">
-                        <table class="w-full text-left text-sm whitespace-nowrap">
-                            <thead class="text-slate-500 border-b-2 border-slate-200">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs sm:text-sm whitespace-nowrap">
+                            <thead class="text-slate-500 border-b-2 border-slate-200 bg-slate-50">
                                 <tr>
                                     <th class="px-4 py-3 font-semibold">Nama Barang</th>
                                     <th class="px-4 py-3 font-semibold text-center">Stok Sistem</th>
@@ -280,42 +293,42 @@
             <!-- 4. LAPORAN KEUANGAN -->
             <div id="sec-keuangan" class="hidden fade-in space-y-6">
                 <!-- Financial Summaries -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div class="bg-gradient-to-br from-blue-500 to-blue-700 p-5 rounded-xl shadow-md text-white relative overflow-hidden">
                         <i class="fas fa-calendar-day absolute -right-4 -bottom-4 text-6xl opacity-20"></i>
-                        <p class="text-blue-100 text-sm font-medium mb-1">Pendapatan Hari Ini</p>
-                        <h3 class="text-2xl font-black">Rp 4.500.000</h3>
-                        <p class="text-xs mt-2 opacity-80"><i class="fas fa-arrow-up mr-1"></i> +12% dari kemarin</p>
+                        <p class="text-blue-100 text-xs sm:text-sm font-medium mb-1">Pendapatan Hari Ini</p>
+                        <h3 class="text-xl sm:text-2xl font-black">Rp 4.500.000</h3>
+                        <p class="text-[11px] mt-2 opacity-80"><i class="fas fa-arrow-up mr-1"></i> +12% dari kemarin</p>
                     </div>
                     <div class="bg-gradient-to-br from-emerald-500 to-emerald-700 p-5 rounded-xl shadow-md text-white relative overflow-hidden">
                         <i class="fas fa-calendar-week absolute -right-4 -bottom-4 text-6xl opacity-20"></i>
-                        <p class="text-emerald-100 text-sm font-medium mb-1">Pendapatan Minggu Ini</p>
-                        <h3 class="text-2xl font-black">Rp 31.250.000</h3>
-                        <p class="text-xs mt-2 opacity-80"><i class="fas fa-minus mr-1"></i> Stabil</p>
+                        <p class="text-emerald-100 text-xs sm:text-sm font-medium mb-1">Pendapatan Minggu Ini</p>
+                        <h3 class="text-xl sm:text-2xl font-black">Rp 31.250.000</h3>
+                        <p class="text-[11px] mt-2 opacity-80"><i class="fas fa-minus mr-1"></i> Stabil</p>
                     </div>
                     <div class="bg-gradient-to-br from-purple-500 to-purple-700 p-5 rounded-xl shadow-md text-white relative overflow-hidden">
                         <i class="fas fa-calendar-alt absolute -right-4 -bottom-4 text-6xl opacity-20"></i>
-                        <p class="text-purple-100 text-sm font-medium mb-1">Pendapatan Bulan Ini</p>
-                        <h3 class="text-2xl font-black">Rp 125.800.000</h3>
-                        <p class="text-xs mt-2 opacity-80 text-white">Target tercapai 85%</p>
+                        <p class="text-purple-100 text-xs sm:text-sm font-medium mb-1">Pendapatan Bulan Ini</p>
+                        <h3 class="text-xl sm:text-2xl font-black">Rp 125.800.000</h3>
+                        <p class="text-[11px] mt-2 opacity-80">Target tercapai 85%</p>
                     </div>
                 </div>
 
                 <!-- Transactions History -->
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200">
-                    <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
-                        <h3 class="font-bold text-slate-800">Riwayat Transaksi (POS)</h3>
-                        <input type="date" class="border border-slate-300 rounded-lg px-3 py-1.5 text-sm text-slate-600 outline-none focus:border-blue-500">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="px-4 sm:px-6 py-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+                        <h3 class="font-bold text-slate-800 text-sm sm:text-base">Riwayat Transaksi (POS)</h3>
+                        <input type="date" class="border border-slate-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm text-slate-600 outline-none focus:border-blue-500 w-max">
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm whitespace-nowrap">
+                        <table class="w-full text-left text-xs sm:text-sm whitespace-nowrap">
                             <thead class="bg-slate-50 text-slate-600 border-b border-slate-200">
                                 <tr>
-                                    <th class="px-6 py-3 font-semibold">Order ID</th>
-                                    <th class="px-6 py-3 font-semibold">Tanggal & Waktu</th>
-                                    <th class="px-6 py-3 font-semibold">Kasir</th>
-                                    <th class="px-6 py-3 font-semibold">Metode Bayar</th>
-                                    <th class="px-6 py-3 font-semibold text-right">Total Transaksi</th>
+                                    <th class="px-4 sm:px-6 py-3 font-semibold">Order ID</th>
+                                    <th class="px-4 sm:px-6 py-3 font-semibold">Tanggal & Waktu</th>
+                                    <th class="px-4 sm:px-6 py-3 font-semibold">Kasir</th>
+                                    <th class="px-4 sm:px-6 py-3 font-semibold">Metode Bayar</th>
+                                    <th class="px-4 sm:px-6 py-3 font-semibold text-right">Total Transaksi</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100" id="tb-riwayat-transaksi">
@@ -337,6 +350,22 @@
 
     <!-- JavaScript Logic -->
     <script>
+        // --- Sidebar Mobile Toggle Logic ---
+        const toggleSidebar = () => {
+            const sidebar = document.querySelector('aside');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('opacity-0');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
+        };
+
         // --- Navigation Logic ---
         const sections = ['dashboard', 'barang', 'stok', 'keuangan'];
         const titles = {
@@ -347,7 +376,6 @@
         };
 
         const switchMenu = (targetId) => {
-            // Update UI Sections
             sections.forEach(sec => {
                 document.getElementById(`sec-${sec}`).classList.add('hidden');
                 document.getElementById(`nav-${sec}`).classList.remove('active');
@@ -355,20 +383,26 @@
             
             document.getElementById(`sec-${targetId}`).classList.remove('hidden');
             document.getElementById(`nav-${targetId}`).classList.add('active');
-            
-            // Update Title
             document.getElementById('page-title').innerText = titles[targetId];
+
+            // Otomatis tutup sidebar di HP setelah menu diklik
+            if (window.innerWidth < 768) {
+                const sidebar = document.querySelector('aside');
+                if (!sidebar.classList.contains('-translate-x-full')) {
+                    toggleSidebar();
+                }
+            }
         };
 
         // --- Mock Data & Rendering ---
         const formatRp = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
 
         const mockProducts = [
-            { id: 'BRG-001', name: 'sapu lidi', category: 'Sembako', cost: 70000, price: 75000, stock: 120 },
-            { id: 'BRG-002', name: 'serok gorengan', category: 'Sembako', cost: 33000, price: 36000, stock: 15 },
-            { id: 'BRG-003', name: 'wajan', category: 'Sembako', cost: 14500, price: 16500, stock: 4 },
-            { id: 'BRG-004', name: 'sabun mandi', category: 'Sabun', cost: 3500, price: 4500, stock: 0 },
-            { id: 'BRG-005', name: 'rak kecil', category: 'Sembako', cost: 2800, price: 3200, stock: 250 },
+            { id: 'BRG-001', name: 'Sapu Lidi Taman', category: 'Sembako', cost: 70000, price: 75000, stock: 120 },
+            { id: 'BRG-002', name: 'Serok Sampah Plastik', category: 'Sembako', cost: 33000, price: 36000, stock: 15 },
+            { id: 'BRG-003', name: 'Wajan Anti Lengket 30cm', category: 'Sembako', cost: 145000, price: 165000, stock: 4 },
+            { id: 'BRG-004', name: 'Sabun Mandi Batang', category: 'Sabun', cost: 3500, price: 4500, stock: 0 },
+            { id: 'BRG-005', name: 'Rak Kecil 3 Susun', category: 'Sembako', cost: 110000, price: 130000, stock: 250 },
         ];
 
         const mockTransactions = [
@@ -378,20 +412,19 @@
             { id: 'INV-261021-004', date: '21 Okt 2026, 12:05', cashier: 'Andi (Pengganti)', method: 'Debit', total: 68000 },
         ];
 
-        // Render Tables on Load
         window.onload = () => {
             // 1. Render Master Barang
             const tbMaster = document.getElementById('tb-master-barang');
             mockProducts.forEach(p => {
                 tbMaster.innerHTML += `
                     <tr class="hover:bg-slate-50">
-                        <td class="px-6 py-3 font-mono text-xs">${p.id}</td>
-                        <td class="px-6 py-3 font-bold">${p.name}</td>
-                        <td class="px-6 py-3"><span class="bg-slate-100 text-slate-600 px-2 py-1 rounded text-xs">${p.category}</span></td>
-                        <td class="px-6 py-3">${formatRp(p.cost)}</td>
-                        <td class="px-6 py-3 text-blue-700 font-bold">${formatRp(p.price)}</td>
-                        <td class="px-6 py-3 text-right">
-                            <button class="text-blue-500 hover:text-blue-700 mr-3" title="Edit"><i class="fas fa-edit"></i></button>
+                        <td class="px-4 sm:px-6 py-3 font-mono text-xs">${p.id}</td>
+                        <td class="px-4 sm:px-6 py-3 font-bold">${p.name}</td>
+                        <td class="px-4 sm:px-6 py-3"><span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs">${p.category}</span></td>
+                        <td class="px-4 sm:px-6 py-3">${formatRp(p.cost)}</td>
+                        <td class="px-4 sm:px-6 py-3 text-blue-700 font-bold">${formatRp(p.price)}</td>
+                        <td class="px-4 sm:px-6 py-3 text-right">
+                            <button class="text-blue-500 hover:text-blue-700 mr-2 sm:mr-3" title="Edit"><i class="fas fa-edit"></i></button>
                             <button class="text-red-500 hover:text-red-700" title="Hapus"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>
@@ -404,12 +437,12 @@
                 let statusBadge = '';
                 let bgRow = '';
                 if (p.stock > 20) {
-                    statusBadge = '<span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-bold"><i class="fas fa-check-circle mr-1"></i> Aman</span>';
+                    statusBadge = '<span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs font-bold"><i class="fas fa-check-circle mr-1"></i> Aman</span>';
                 } else if (p.stock > 0) {
-                    statusBadge = '<span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs font-bold"><i class="fas fa-exclamation-triangle mr-1"></i> Menipis</span>';
+                    statusBadge = '<span class="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full text-xs font-bold"><i class="fas fa-exclamation-triangle mr-1"></i> Menipis</span>';
                     bgRow = 'bg-yellow-50/30';
                 } else {
-                    statusBadge = '<span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-bold"><i class="fas fa-times-circle mr-1"></i> Habis</span>';
+                    statusBadge = '<span class="bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-xs font-bold"><i class="fas fa-times-circle mr-1"></i> Habis</span>';
                     bgRow = 'bg-red-50/50';
                 }
 
@@ -417,12 +450,12 @@
                     <tr class="${bgRow} hover:bg-slate-100 transition-colors">
                         <td class="px-4 py-3">
                             <p class="font-bold text-slate-800">${p.name}</p>
-                            <p class="text-xs text-slate-500 font-mono">${p.id}</p>
+                            <p class="text-[10px] sm:text-xs text-slate-500 font-mono">${p.id}</p>
                         </td>
-                        <td class="px-4 py-3 text-center text-lg font-black ${p.stock <= 0 ? 'text-red-600' : 'text-slate-700'}">${p.stock}</td>
+                        <td class="px-4 py-3 text-center text-base sm:text-lg font-black ${p.stock <= 0 ? 'text-red-600' : 'text-slate-700'}">${p.stock}</td>
                         <td class="px-4 py-3 text-center">${statusBadge}</td>
                         <td class="px-4 py-3 text-center">
-                            <button class="bg-white border border-slate-300 hover:bg-slate-50 text-slate-600 px-3 py-1.5 rounded shadow-sm text-xs font-semibold">
+                            <button class="bg-white border border-slate-300 hover:bg-slate-50 text-slate-600 px-2.5 py-1 rounded shadow-sm text-xs font-semibold">
                                 Update Manual
                             </button>
                         </td>
@@ -435,19 +468,18 @@
             mockTransactions.forEach(t => {
                 tbTrans.innerHTML += `
                     <tr class="hover:bg-slate-50">
-                        <td class="px-6 py-3 font-bold text-blue-600">${t.id}</td>
-                        <td class="px-6 py-3 text-slate-500 text-sm">${t.date}</td>
-                        <td class="px-6 py-3">${t.cashier}</td>
-                        <td class="px-6 py-3">
-                            <span class="border border-slate-200 bg-white text-slate-700 px-2 py-1 rounded text-xs font-medium">${t.method}</span>
+                        <td class="px-4 sm:px-6 py-3 font-bold text-blue-600">${t.id}</td>
+                        <td class="px-4 sm:px-6 py-3 text-slate-500">${t.date}</td>
+                        <td class="px-4 sm:px-6 py-3">${t.cashier}</td>
+                        <td class="px-4 sm:px-6 py-3">
+                            <span class="border border-slate-200 bg-white text-slate-700 px-2 py-0.5 rounded text-xs font-medium">${t.method}</span>
                         </td>
-                        <td class="px-6 py-3 text-right font-black text-slate-800">${formatRp(t.total)}</td>
+                        <td class="px-4 sm:px-6 py-3 text-right font-black text-slate-800">${formatRp(t.total)}</td>
                     </tr>
                 `;
             });
         };
 
-        // --- Utils ---
         const showToast = (msg) => {
             const toast = document.getElementById('toast');
             document.getElementById('toast-msg').innerText = msg;
